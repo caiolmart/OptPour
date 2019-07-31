@@ -7,32 +7,11 @@ class Node:
         self.state = state
 
     def get_next_nodes(self):
-        if self.state == None:
-            return[(0, 0)]
-        matrix = np.zeros((self.maxrow + 1, self.maxcol + 1), dtype=bool)
-        matrix[0, :] = 1
-        matrix[:, 0] = 1
+        return self.get_children(self.state)
 
-        for tup in self.state:
-            matrix[tup[0] + 1, tup[1] + 1] = 1
-
-        candidates = []
-        for i in range(1, self.maxrow + 1):
-            for j in range(1, self.maxcol + 1):
-                if (not matrix[i, j] and matrix[i - 1, j] and matrix[i, j - 1]):
-                    candidates.append((i - 1, j - 1))
-        
-        next_nodes = []
-        for candidate in candidates:
-            next_node = list(self.state)
-            next_node.append(candidate)
-            next_node.sort()
-            next_nodes.append(tuple(next_node))
-        return next_nodes
-
-    def get_childs(self, state):
+    def get_children(self, state):
         if state == None:
-            return[(0, 0)]
+            return[((0, 0), )]
         matrix = np.zeros((self.maxrow + 1, self.maxcol + 1), dtype=bool)
         matrix[0, :] = 1
         matrix[:, 0] = 1
@@ -63,8 +42,17 @@ class Node:
                 if child == (0, 0):
                     child = ((0, 0),)
                 children.add(child)
-                this_children_set = set(self.get_childs(child)) | this_children_set
+                this_children_set = set(self.get_children(child)) | \
+                    this_children_set
             this_children = list(this_children_set)
         return children
-        
 
+    def array_from_state(self, state):
+        matrix = np.zeros((self.maxrow, self.maxcol), dtype=bool)
+        for tup in state:
+            matrix[tup[0], tup[1]] = 1
+        return matrix
+
+    def eval_qtt(self, state, qtt_array):
+        state_array = self.array_from_state(state)
+        return np.sum(np.multiply(state_array, qtt_array))
