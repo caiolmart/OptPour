@@ -56,3 +56,8 @@ class Node:
     def eval_qtt(self, state, qtt_array):
         state_array = self.array_from_state(state)
         return np.sum(np.multiply(state_array, qtt_array))
+
+    def eval_br(self, state, qtt_array, bad_array):
+        total = self.eval_qtt(state, qtt_array)
+        bad = self.eval_qtt(state, bad_array)
+        return bad / total
