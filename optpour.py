@@ -61,3 +61,24 @@ class Node:
         total = self.eval_qtt(state, qtt_array)
         bad = self.eval_qtt(state, bad_array)
         return bad / total
+
+    def optimize_naive(self, qtt_array, bad_array, br_threshold, 
+                       only_in_thresh=True):
+        all_states = self.get_all_children()
+        candidates = dict()
+        for state in all_states:
+            br = self.eval_br(state, qtt_array, bad_array)
+            qtt = self.eval_qtt(state, qtt_array)
+            if br <= br_threshold:
+                in_thresh = 1
+            else:
+                in_thresh = 0
+            candidates[state] = (in_thresh, qtt, br)
+        sorted_candidates = sorted(candidates.items(), 
+                                   key=lambda x: (x[1][0], x[1][1], -x[1][2]),
+                                   reverse=True)
+        if only_in_thresh:
+            only_in = [x for x in sorted_candidates if x[1][0] == 1]
+            return only_in
+        else:
+            return sorted_candidates
